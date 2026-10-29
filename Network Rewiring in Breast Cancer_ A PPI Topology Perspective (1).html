@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Network Rewiring in Breast Cancer: A PPI Topology Perspective</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF1F6;--card:#fff;--ink:#1B2A41;--muted:#55657A;--line:#d5dde8;--navy:#0B1F3A;--navyb:#1A4175;--tumor:#E4572E;--normal:#0E9AA7;--gold:#F6B93B;--indigo:#3F5BA9;--link:#1A4175;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0a1423;--card:#111f35;--ink:#e6edf7;--muted:#9fb0c5;--line:#223652;--link:#8fb4ee;--indigo:#8fa6e6}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0a1423;--card:#111f35;--ink:#e6edf7;--muted:#9fb0c5;--line:#223652;--link:#8fb4ee;--indigo:#8fa6e6}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.6 "IBM Plex Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque","IBM Plex Sans",sans-serif;line-height:1.1;margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+header{background:linear-gradient(100deg,var(--navy),var(--navyb));color:#fff;padding:64px 0 0;position:relative;overflow:hidden}
+header h1{font-size:clamp(2.4rem,6.5vw,4.8rem);font-weight:800;max-width:14ch;letter-spacing:-.02em}
+header .sub{color:var(--gold);font:700 clamp(1.1rem,2.4vw,1.5rem)/1.3 "Bricolage Grotesque",sans-serif;margin:18px 0 10px}
+header p.lead{max-width:60ch;color:#c9d6e8;margin:0 0 28px}
+.auth{font-weight:600;margin:0}.aff{font-size:.85rem;color:#b3c3da;margin:4px 0 36px;max-width:80ch}
+.bar{height:7px;display:flex}.bar i:nth-child(1){flex:560;background:var(--tumor)}.bar i:nth-child(2){flex:140;background:var(--gold)}.bar i:nth-child(3){flex:141;background:var(--normal)}
+#bgnet{position:absolute;right:-40px;top:0;width:min(560px,70%);height:100%;opacity:.5;pointer-events:none}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);margin:36px 0 8px;border-block:1px solid var(--line)}
+.kpi{padding:22px 18px;border-left:1px solid var(--line)}.kpi:first-child{border-left:0;padding-left:0}
+.kpi b{display:block;font:800 clamp(2rem,4.4vw,3rem)/1 "Bricolage Grotesque",sans-serif;color:var(--tumor)}
+.kpi strong{display:block;margin-top:8px}.kpi span{font-size:.9rem;color:var(--muted)}
+section{padding:56px 0 8px}
+h2{font-size:clamp(1.7rem,3.6vw,2.5rem);letter-spacing:-.01em;margin-bottom:10px}
+.intro{color:var(--muted);max-width:62ch;margin:0 0 26px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px}
+.seg{display:inline-flex;border:2px solid var(--navyb);border-radius:999px;padding:3px;gap:2px;margin-bottom:16px}
+.seg button{font:600 .95rem "IBM Plex Sans",sans-serif;border:0;background:none;color:var(--ink);padding:8px 18px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--navyb);color:#fff}
+.seg button.t[aria-pressed=true]{background:var(--tumor)}.seg button.n[aria-pressed=true]{background:var(--normal)}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.explore{display:grid;grid-template-columns:1.15fr 1fr;gap:28px;align-items:start}
+#net{width:100%;height:auto;display:block;overflow:visible}
+#net g.set{transition:opacity .7s}#net g.off{opacity:0;pointer-events:none}
+#net .e{stroke-width:1.2;stroke-linecap:round}#net g.nrm .e{stroke:var(--normal);opacity:.6}#net g.tum .e{stroke:var(--tumor);opacity:.5}
+#net .node circle{stroke:var(--card);stroke-width:1;transition:opacity .2s}
+#net text{font:600 3.6px "IBM Plex Sans",sans-serif;fill:var(--ink);paint-order:stroke;stroke:var(--card);stroke-width:1.2px;text-anchor:middle}
+#net.hl .node:not(.on),#net.hl .e:not(.on){opacity:.12}
+#net .node{cursor:pointer}
+.pills{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:6px 0 16px}
+.pill{border:1.5px solid var(--c);border-radius:12px;padding:8px 4px;text-align:center;background:color-mix(in srgb,var(--c) 10%,transparent);transition:border-color .5s,background .5s}
+.pill small{display:block;color:var(--muted);font-size:.8rem}.pill b{font:800 1.35rem "Bricolage Grotesque",sans-serif;color:var(--c)}
+.leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82rem;color:var(--muted);margin:12px 0 0;padding:0;list-style:none}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+.note{font-size:.85rem;color:var(--muted)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.row{display:grid;grid-template-columns:104px 1fr;gap:10px;align-items:center;margin:11px 0;font-weight:600;font-size:.95rem}
+.track{position:relative;height:26px}.track:before{content:"";position:absolute;left:var(--z);top:-5px;bottom:-5px;width:2px;background:var(--muted);opacity:.6}
+.fill{position:absolute;top:3px;height:20px;border-radius:4px;width:0;transition:width 1s cubic-bezier(.2,.7,.2,1)}
+.val{position:absolute;top:2px;font-size:.88rem;font-weight:700}
+.sw{display:grid;grid-template-columns:118px 1fr;gap:8px;align-items:center;margin:7px 0;font-size:.88rem;font-weight:600}
+.sw .d{display:grid;grid-template-columns:1fr 1fr;height:20px;gap:0}.sw .d>div{position:relative}
+.sw .l,.sw .r{position:absolute;top:0;height:100%;width:0;transition:width 1s}.sw .l{right:0;background:var(--normal);border-radius:4px 0 0 4px}.sw .r{left:0;background:var(--tumor);border-radius:0 4px 4px 0}
+.sw em{position:absolute;top:1px;font-style:normal;font-size:.78rem;font-weight:700}
+.hdr{display:flex;justify-content:space-between;font-size:.8rem;font-weight:700;margin:0 0 6px 126px}
+.chart svg{width:100%;height:auto;display:block}.chart text{font:600 12px "IBM Plex Sans",sans-serif;fill:var(--muted)}
+.chart .grid{stroke:var(--line)}.chart .ln{fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.chart .draw{stroke-dasharray:1000;stroke-dashoffset:1000;animation:d 1.2s ease forwards}
+@keyframes d{to{stroke-dashoffset:0}}
+.takeaway{margin:14px 0 0;font-size:1rem}.hl{color:var(--tumor);font-weight:700}.hn{color:var(--normal);font-weight:700}
+.hyp{list-style:none;margin:0;padding:0;counter-reset:h}
+.hyp li{counter-increment:h;display:grid;grid-template-columns:38px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.hyp li:first-child{border-top:0}.hyp li:before{content:counter(h);width:32px;height:32px;border-radius:50%;background:var(--normal);color:#fff;font:700 1rem/32px "Bricolage Grotesque",sans-serif;text-align:center}
+.hyp b{display:block}.concl li{margin:10px 0}
+details{border-top:1px solid var(--line);padding:14px 0}summary{cursor:pointer;font-weight:600}
+.flow{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;padding:0;list-style:none}.flow li{background:color-mix(in srgb,var(--navyb) 12%,transparent);border-radius:8px;padding:6px 12px;font-size:.9rem}
+footer{margin-top:56px;background:var(--navy);color:#c9d6e8;padding:32px 0 40px;font-size:.85rem}
+footer h3{color:var(--gold);font-size:1rem;margin-bottom:6px}footer .g{display:grid;grid-template-columns:1fr 1.6fr 1fr;gap:28px}footer a{color:#fff}
+@media(max-width:820px){.explore,.cols,footer .g{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}.kpi:nth-child(3){border-left:0;padding-left:0}.kpi{border-top:1px solid var(--line)}.hdr{margin-left:0}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.chart .draw{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+<header>
+<svg id="bgnet" viewBox="0 0 300 200" aria-hidden="true"></svg>
+<div class="wrap" style="position:relative">
+<h1>Network Rewiring in Breast Cancer</h1>
+<div class="sub">A PPI topology perspective</div>
+<p class="lead">From modular homeostasis to a hyperconnected oncogenic core: robust to random hits, fragile at its bottlenecks.</p>
+<p class="auth">A. Guerra González¹ · A. Valdés López¹ · C. González² · E.C. Herrera Hernández¹*</p>
+<p class="aff">¹Laboratorio de Modelación y Simulación Multifísica, Facultad de Ciencias Químicas, UASLP · ²Laboratorio de Fisiología Celular, Facultad de Ciencias Químicas, UASLP · San Luis Potosí, México</p>
+</div>
+<div class="bar"><i></i><i></i><i></i></div>
+</header>
+
+<main class="wrap">
+<div class="kpis">
+<div class="kpi"><b>×4.2</b><strong>Clustering coefficient</strong><span>C̄: 0.0645 → 0.2716 (+321%)</span></div>
+<div class="kpi"><b>−25%</b><strong>Average path length</strong><span>ℓ̄: 6.34 → 4.75</span></div>
+<div class="kpi"><b>−16%</b><strong>Modularity</strong><span>Q: 0.7993 → 0.6689</span></div>
+<div class="kpi"><b>+24%</b><strong>Edges &amp; density</strong><span>62 → 77 edges, same 62 nodes</span></div>
+</div>
+
+<section>
+<h2>Two interactomes, two architectures</h2>
+<p class="intro">Breast cancer caused 2.3 M new cases and 666 k deaths in 2022, and is projected to exceed 6 M cases a year by 2050. Tumor phenotypes emerge from coordinated protein interactions, so we compare the PPI network of normal mammary epithelium with that of Luminal A tumor.</p>
+<div class="panel">
+<div class="seg" role="group" aria-label="Choose network">
+<button class="n" id="bN" aria-pressed="true">Normal epithelium</button>
+<button class="t" id="bT" aria-pressed="false">Luminal A tumor</button>
+</div>
+<div class="explore">
+<div><svg id="net" viewBox="0 0 150 156" role="img" aria-label="Schematic PPI network of key nodes; switch between normal and tumor"></svg></div>
+<div>
+<h3 id="ntitle" style="font-size:1.5rem">Sparse and compartmentalized</h3>
+<p id="ndesc" class="intro" style="margin:8px 0 14px"></p>
+<div class="pills" id="pills"></div>
+<p class="note">Hover or tap a node to see its neighbors. Schematic of key nodes described in the study (not the full graphs); size ∝ degree.</p>
+<ul class="leg" id="leg"></ul>
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<h2>Quantified rewiring</h2>
+<p class="intro">Relative change in the tumor network compared with normal epithelium, and how gene functions are redistributed.</p>
+<div class="cols">
+<div class="panel"><h3>Tumor vs. normal (%)</h3><div id="rew" style="margin-top:14px"></div>
+<p class="takeaway"><span class="hl">Triangles ×4</span> give bypass routes around inhibited nodes. <span class="hl">Shorter paths</span> let EGFR reach MYC/CCND1 in fewer steps. <span class="hl">Lower Q</span> means PI3K/AKT and MAPK pathways entangle.</p></div>
+<div class="panel"><h3>Functional identity swap</h3>
+<div class="hdr" style="margin-top:12px"><span class="hn">◀ Normal</span><span class="hl">Breast cancer ▶</span></div><div id="swap"></div>
+<p class="takeaway">Oncogene, DNA-repair and tumor-suppressor nodes appear <b>only</b> in the tumor network. ECM, lactation, differentiation and UPR programs vanish, consistent with EMT-like loss of epithelial identity.</p></div>
+</div>
+</section>
+
+<section>
+<h2>Robust to chance, fragile at the hubs</h2>
+<p class="intro">We removed nodes in silico and tracked the giant component S: random failures (100 Monte Carlo runs) against targeted attacks on the highest-degree nodes.</p>
+<div class="panel chart">
+<div class="seg" role="group" aria-label="Choose perturbation">
+<button id="bR" aria-pressed="true">Random failures</button>
+<button id="bH" aria-pressed="false">Hub attack</button>
+</div>
+<div id="lc"></div>
+<p class="takeaway" id="ltxt"></p>
+</div>
+</section>
+
+<section>
+<h2>Therapy hypotheses</h2>
+<div class="cols">
+<div class="panel"><ol class="hyp">
+<li><div><b>Multi-target hub inhibition</b>PI3K + AKT + mTOR inhibitors (alpelisib, capivasertib, everolimus).</div></li>
+<li><div><b>Hit the bottlenecks</b>Co-target AKT1 (hub) and CTNNB1 (bridge) to fragment the core.</div></li>
+<li><div><b>Restore modularity</b>Wnt/β-catenin or EMT-TF (SNAI1, ZEB1) inhibition.</div></li>
+<li><div><b>Topological biomarkers</b>C̄, Q, E<sub>glob</sub> alongside ER, PR, HER2, Ki-67.</div></li>
+<li><div><b>Disrupt PPI interfaces</b>AKT1/CTNNB1 surfaces: more specific than ATP-competitive drugs.</div></li>
+</ol><p class="note">Hypotheses from topology; pending experimental validation.</p></div>
+<div class="panel"><h3>Conclusions</h3>
+<ul class="concl">
+<li>Malignancy is a <b>network reorganization</b>: denser, ×4.2 clustering, shorter paths, lower modularity.</li>
+<li>A hyperconnected core, <b>resilient to random hits</b> yet dependent on a few bottlenecks.</li>
+<li>Rationale for <b>multi-node combination</b> instead of single-target therapy. Next: in-silico multi-hub knock-outs and scRNA-seq PPI networks.</li>
+</ul>
+<details><summary>Methods in brief</summary>
+<ul class="flow"><li>RegulonDB</li><li>BioGRID</li><li>KEGG</li><li>HPRD</li><li>STRING ≥ 700</li><li>IntNetDB</li></ul>
+<p class="note">Naïve Bayes integration (LR<sub>max</sub> rule, posterior P &gt; 0.5) gave a normal network (62 nodes, 62 edges) and a Luminal A network (62 nodes, 77 edges). We measured density, clustering, path length and Louvain modularity, then ran random and targeted (degree, betweenness) removal of 0–80% of nodes, tracking S and E<sub>glob</sub>.</p></details>
+</div>
+</div>
+</section>
+</main>
+
+<footer><div class="wrap g">
+<div><h3>Limitations &amp; scope</h3>Static topological snapshot built from 62 manually curated genes per network (no differential-expression filtering); PPI graphs omit dynamics, concentrations and PTMs. Findings are hypotheses pending experimental validation.</div>
+<div><h3>Selected references</h3>Bray F. et al. GLOBOCAN 2022. CA Cancer J Clin 74, 229 (2024) · Barabási A.-L., Gulbahce N., Loscalzo J. Network medicine. Nat Rev Genet 12, 56 (2011) · Albert R. Scale-free networks in cell biology. J Cell Sci 118, 4947 (2005) · Blondel V.D. et al. Fast unfolding of communities. J Stat Mech P10008 (2008) · Szklarczyk D. et al. The STRING database in 2021. Nucleic Acids Res 49, D605 (2021) · TCGA Network. Comprehensive molecular portraits of human breast tumours. Nature 490, 61 (2012).</div>
+<div><h3>Funding</h3>A.G.G. and A.V.L. thank SECIHTI (México) for financial support.<h3 style="margin-top:14px">Contact</h3><a href="mailto:erik.herrera@uaslp.mx">erik.herrera@uaslp.mx</a></div>
+</div></footer>
+
+<script>
+const $=s=>document.querySelector(s),NS="http://www.w3.org/2000/svg";
+const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p&&p.appendChild(e);return e};
+const C={onco:"#E53935",signal:"#FB8C00",dnarep:"#1E88E5",suppr:"#8E24AA",tfac:"#00ACC1",epi:"#43A047",ccyc:"#78909C",lact:"#F9C70C",ecm:"#8D6E63",stress:"#EC407A",metab:"#5C7C99",diffe:"#FFA726"};
+const NAME={onco:"Oncogene",signal:"Signaling",dnarep:"DNA repair",suppr:"Tumor suppr.",tfac:"Transcr. factor",epi:"Epithelial",ccyc:"Cell cycle",lact:"Lactation",ecm:"ECM",stress:"Stress resp.",metab:"Metabolism",diffe:"Differentiation"};
+const DATA={
+ n:{title:"Sparse and compartmentalized",desc:"Small, insulated modules: unfolded-protein response, lactation, extracellular matrix, epithelial identity and metabolism each stay in their own neighborhood.",col:"#0E9AA7",cls:"nrm",
+  stats:[["ρ","0.033"],["C̄","0.065"],["ℓ̄","6.34"],["Q","0.80"]],
+  nodes:{HSPA5:[44,112,6,"stress"],EIF2AK3:[20,134,4.5,"stress"],ATF6:[62,134,4.5,"stress"],XBP1:[24,92,4.5,"stress"],STAT5A:[104,114,6,"diffe"],ELF5:[124,132,4.5,"diffe"],PRL:[94,136,4,"lact"],GHR:[124,98,4,"lact"],LALBA:[68,86,4,"lact"],CSN2:[82,76,4,"lact"],FASN:[22,56,5,"metab"],IGF1:[50,44,5,"metab"],COL1A1:[104,64,4.5,"ecm"],FN1:[120,42,4.5,"ecm"],LAMA5:[92,30,4.5,"ecm"],EPCAM:[20,20,4.5,"epi"],CDH1:[54,20,4.5,"epi"],KRT8:[76,8,4.5,"epi"]},
+  edges:"HSPA5-EIF2AK3 HSPA5-ATF6 HSPA5-XBP1 ATF6-XBP1 STAT5A-ELF5 STAT5A-PRL STAT5A-GHR LALBA-CSN2 FASN-IGF1 COL1A1-FN1 FN1-LAMA5 LAMA5-COL1A1 EPCAM-CDH1 CDH1-KRT8"},
+ t:{title:"Compact, hub-centered core",desc:"AKT1 sits at the center of a PI3K/AKT, MAPK and Wnt core that links oncogenes, cell cycle, tumor suppressors and DNA repair. Epithelial, ECM and lactation programs are gone.",col:"#E4572E",cls:"tum",
+  stats:[["ρ","0.041"],["C̄","0.272"],["ℓ̄","4.75"],["Q","0.67"]],
+  nodes:{AKT1:[66,80,11.5,"signal"],PIK3CA:[58,118,7.5,"signal"],ERBB2:[22,98,7.5,"onco"],EGFR:[18,64,6.5,"signal"],MAPK1:[38,36,6.5,"signal"],mTOR:[70,46,5.5,"signal"],MYC:[110,72,7.5,"onco"],CCND1:[100,42,6,"onco"],CDK4:[122,20,4.5,"ccyc"],CDK6:[84,18,4.5,"ccyc"],CTNNB1:[92,104,7,"tfac"],CDH1:[116,118,4.5,"epi"],TP53:[86,138,6,"suppr"],BRCA1:[118,140,5.5,"dnarep"]},
+  edges:"AKT1-PIK3CA AKT1-ERBB2 AKT1-EGFR AKT1-MAPK1 AKT1-mTOR AKT1-MYC AKT1-CTNNB1 ERBB2-PIK3CA ERBB2-EGFR EGFR-MAPK1 MAPK1-mTOR PIK3CA-CTNNB1 MYC-CTNNB1 MYC-CCND1 mTOR-CCND1 CCND1-CDK4 CCND1-CDK6 CTNNB1-CDH1 CTNNB1-TP53 TP53-BRCA1"}};
+const net=$("#net"),Y=y=>152-y;
+for(const k in DATA){const d=DATA[k],g=el("g",{class:"set "+d.cls+(k=="t"?" off":""),id:"g"+k},net);
+ d.edges.split(" ").forEach(s=>{const[a,b]=s.split("-"),A=d.nodes[a],B=d.nodes[b];el("line",{class:"e","data-a":a,"data-b":b,x1:A[0],y1:Y(A[1]),x2:B[0],y2:Y(B[1])},g)});
+ for(const n in d.nodes){const[x,y,r,c]=d.nodes[n],ng=el("g",{class:"node","data-n":n,tabindex:0},g);
+  el("circle",{cx:x,cy:Y(y),r,fill:C[c]},ng);
+  const t=el("text",{x,y:n=="AKT1"?Y(y)+1.3:Y(y)-r-1.6},ng);t.textContent=n;if(n=="AKT1"){t.style.fill="#fff";t.style.stroke="none";t.style.fontSize="4.4px"}}
+ g.addEventListener("pointerover",e=>{const n=e.target.closest(".node");if(!n)return;const id=n.dataset.n;net.classList.add("hl");g.querySelectorAll(".node").forEach(m=>m.classList.toggle("on",m==n));
+  g.querySelectorAll(".e").forEach(l=>{const on=l.dataset.a==id||l.dataset.b==id;l.classList.toggle("on",on);if(on)g.querySelectorAll(".node").forEach(m=>{if(m.dataset.n==l.dataset.a||m.dataset.n==l.dataset.b)m.classList.add("on")})})});
+ g.addEventListener("pointerleave",()=>net.classList.remove("hl"));
+ g.addEventListener("focusin",e=>e.target.dispatchEvent(new PointerEvent("pointerover",{bubbles:true})));
+}
+const pills=$("#pills");let cur={};
+function setNet(k){const d=DATA[k];
+ $("#bN").setAttribute("aria-pressed",k=="n");$("#bT").setAttribute("aria-pressed",k=="t");
+ $("#gn").classList.toggle("off",k!="n");$("#gt").classList.toggle("off",k!="t");net.classList.remove("hl");
+ $("#ntitle").textContent=d.title;$("#ndesc").textContent=d.desc;
+ pills.innerHTML=d.stats.map(([s,v])=>`<div class="pill" style="--c:${d.col}"><small>${s}</small><b>${v}</b></div>`).join("");
+ const used=[...new Set(Object.values(d.nodes).map(n=>n[3]))];
+ $("#leg").innerHTML=used.map(c=>`<li><i style="background:${C[c]}"></i>${NAME[c]}</li>`).join("");}
+$("#bN").onclick=()=>setNet("n");$("#bT").onclick=()=>setNet("t");setNet("n");
+
+/* rewiring bars */
+const REW=[["Clustering",321],["Edges",24],["Density",24],["Path length",-25],["Modularity",-16]],MIN=-60,MAX=360,Z=(0-MIN)/(MAX-MIN)*100;
+$("#rew").innerHTML=REW.map(([n,v])=>`<div class="row"><span>${n}</span><div class="track" style="--z:${Z}%"><div class="fill" data-v="${v}" style="background:${v>0?"var(--tumor)":"var(--indigo)"}"></div><span class="val" data-v="${v}">${v>0?"+":"−"}${Math.abs(v)}%</span></div></div>`).join("");
+/* function swap */
+const SW=[["Oncogene",0,11],["DNA repair",0,11],["Tumor suppressor",0,7],["Cell cycle",0,6],["Transcr. factor",4,7],["Other",29,8],["Epithelial",8,1],["ECM",8,0],["Stress response",4,0],["Differentiation",4,0],["Lactation",3,0]];
+$("#swap").innerHTML=SW.map(([n,a,b])=>`<div class="sw"><span>${n}</span><div class="d"><div><div class="l" data-w="${a/29*100}%"></div>${a?`<em style="right:calc(${a/29*100}% + 4px)">${a}</em>`:""}</div><div><div class="r" data-w="${b/29*100}%"></div>${b?`<em style="left:calc(${b/29*100}% + 4px)">${b}</em>`:""}</div></div></div>`).join("");
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;
+ e.target.querySelectorAll(".fill").forEach(f=>{const v=+f.dataset.v,z=Z,w=Math.abs(v)/(MAX-MIN)*100;f.style.left=(v>0?z:z-w)+"%";f.style.width=w+"%";
+  const t=f.nextElementSibling;t.style.left=v>0?`calc(${z+w}% + 6px)`:`calc(${z-w}% - 50px)`});
+ e.target.querySelectorAll("[data-w]").forEach(b=>b.style.width=b.dataset.w);io.unobserve(e.target)}),{threshold:.25});
+io.observe($("#rew"));io.observe($("#swap"));
+
+/* line charts */
+const X=[0,10,20,30,40,50,60,70,80];
+const LC={r:{c:[.98,.92,.85,.80,.75,.68,.62,.54,.45],n:[.88,.78,.65,.58,.52,.48,.44,.38,.32],xl:"Nodes removed (%)",t:'At 80% random removal, S = <span class="hl">0.45</span> in the tumor vs. <span class="hn">0.32</span> in normal tissue: the tumor network is the more resilient one.'},
+ h:{c:[.98,.92,.85,.78,.68,.58,.45,.28,.05],n:[.88,.82,.38,.37,.22,.15,.12,.08,.04],xl:"Hubs removed (%)",t:'Yet hub attacks collapse the tumor: E<sub>glob</sub> falls from ≈0.25 to ≈0.05 within 20% removal (AKT1, PIK3CA, ERBB2, CTNNB1). The gap with normal at 20% is Δ = +0.47.'}};
+function chart(k){const d=LC[k],W=620,H=320,L=54,R=16,T=14,B=48,px=v=>L+v/80*(W-L-R),py=v=>T+(1-v)/1.05*(H-T-B);
+ $("#bR").setAttribute("aria-pressed",k=="r");$("#bH").setAttribute("aria-pressed",k=="h");
+ let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Giant component versus nodes removed">`;
+ [0,.25,.5,.75,1].forEach(v=>s+=`<line class="grid" x1="${L}" x2="${W-R}" y1="${py(v)}" y2="${py(v)}"/><text x="${L-8}" y="${py(v)+4}" text-anchor="end">${v}</text>`);
+ X.forEach(x=>{if(x%20==0)s+=`<text x="${px(x)}" y="${H-24}" text-anchor="middle">${x}</text>`});
+ s+=`<text x="${(L+W-R)/2}" y="${H-4}" text-anchor="middle">${d.xl}</text><text transform="translate(14 ${(T+H-B)/2}) rotate(-90)" text-anchor="middle">Giant component S</text>`;
+ const pts=a=>a.map((v,i)=>`${px(X[i])},${py(v)}`).join(" ");
+ s+=`<polygon points="${pts(d.c)} ${pts(d.n).split(" ").reverse().join(" ")}" fill="#E4572E" opacity=".13"/>`;
+ s+=`<polyline class="ln draw" pathLength="1000" stroke="#0E9AA7" points="${pts(d.n)}"/><polyline class="ln draw" pathLength="1000" stroke="#E4572E" points="${pts(d.c)}"/>`;
+ if(k=="h")s+=`<line x1="${px(20)}" x2="${px(20)}" y1="${py(.85)}" y2="${py(.38)}" stroke="currentColor" stroke-width="2.5"/><text x="${px(20)+8}" y="${py(.62)}" style="fill:var(--ink);font-weight:700">Δ = +0.47</text>`;
+ s+=`<g font-weight="700"><circle cx="${W-170}" cy="${T+10}" r="6" fill="#E4572E"/><text x="${W-160}" y="${T+14}">Cancer</text><circle cx="${W-95}" cy="${T+10}" r="6" fill="#0E9AA7"/><text x="${W-85}" y="${T+14}">Normal</text></g>`;
+ s+=`<g id="cr" style="display:none"><line id="cl" y1="${T}" y2="${H-B}" stroke="var(--muted)" stroke-dasharray="4 4"/><circle id="c1" r="6" fill="#E4572E"/><circle id="c2" r="6" fill="#0E9AA7"/><text id="ct" style="fill:var(--ink);font-weight:700"></text></g><rect id="hit" x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="transparent"/></svg>`;
+ $("#lc").innerHTML=s;$("#ltxt").innerHTML=d.t;
+ const svg=$("#lc svg"),hit=$("#hit");
+ const mv=e=>{const r=svg.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*W,i=Math.max(0,Math.min(8,Math.round((x-L)/(W-L-R)*8)));
+  $("#cr").style.display="";const X0=px(X[i]);$("#cl").setAttribute("x1",X0);$("#cl").setAttribute("x2",X0);
+  $("#c1").setAttribute("cx",X0);$("#c1").setAttribute("cy",py(d.c[i]));$("#c2").setAttribute("cx",X0);$("#c2").setAttribute("cy",py(d.n[i]));
+  const t=$("#ct");t.textContent=`${X[i]}%: tumor ${d.c[i].toFixed(2)} · normal ${d.n[i].toFixed(2)}`;t.setAttribute("x",i>5?X0-8:X0+8);t.setAttribute("text-anchor",i>5?"end":"start");t.setAttribute("y",T+44)};
+ hit.addEventListener("pointermove",mv);hit.addEventListener("pointerdown",mv);hit.addEventListener("pointerleave",()=>$("#cr").style.display="none")}
+$("#bR").onclick=()=>chart("r");$("#bH").onclick=()=>chart("h");chart("r");
+
+/* header decorative network */
+(()=>{const g=$("#bgnet"),P=[];let s=7;const r=()=>(s=s*16807%2147483647)/2147483647;
+ for(let i=0;i<34;i++)P.push([r()*290+5,r()*190+5,r()<.12]);
+ P.forEach((a,i)=>P.forEach((b,j)=>{if(j>i&&Math.hypot(a[0]-b[0],a[1]-b[1])<42)el("line",{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:"#fff","stroke-opacity":.25},g)}));
+ P.forEach(p=>el("circle",{cx:p[0],cy:p[1],r:p[2]?3.2:1.8,fill:p[2]?"#E4572E":"#fff","fill-opacity":p[2]?1:.5},g))})();
+</script>
+</body>
+</html>
